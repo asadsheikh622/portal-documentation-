@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Management Portal</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Shop Management Portal</h1>
+</header>
+
+<section class="dashboard">
+    <div class="card">
+        <h3>Total Clients</h3>
+        <p id="totalClients">0</p>
+    </div>
+    <div class="card">
+        <h3>Total Income</h3>
+        <p id="totalIncome">0</p>
+    </div>
+</section>
+
+<section class="form-section">
+    <h2>Add Client Record</h2>
+    <form id="clientForm">
+        <input type="text" id="name" placeholder="Client Name" required>
+        <input type="text" id="phone" placeholder="Phone Number" required>
+        <select id="document">
+            <option value="CV">CV</option>
+            <option value="Affidavit">Affidavit</option>
+            <option value="Sale Agreement">Sale Agreement</option>
+        </select>
+        <input type="number" id="charges" placeholder="Charges" required>
+        <button type="submit">Add Record</button>
+    </form>
+</section>
+
+<section class="table-section">
+    <h2>Client Records</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Document</th>
+                <th>Charges</th>
+            </tr>
+        </thead>
+        <tbody id="recordTable">
+        </tbody>
+    </table>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
