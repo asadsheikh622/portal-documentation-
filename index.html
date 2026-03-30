@@ -49,11 +49,81 @@
                 <th>Charges</th>
             </tr>
         </thead>
-        <tbody id="recordTable">
-        </tbody>
+        <tbody id="recordTable"></tbody>
     </table>
 </section>
 
-<script src="script.js"></script>
+<!-- 🔥 Firebase Module Script -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+
+// 🔥 Your Firebase Config (already correct)
+const firebaseConfig = {
+  apiKey: "AIzaSyA03P8WbsCUIQ9ivdq_vSFU6MBPzgY7wLw",
+  authDomain: "customer-portal567.firebaseapp.com",
+  databaseURL: "https://customer-portal567-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "customer-portal567",
+  storageBucket: "customer-portal567.firebasestorage.app",
+  messagingSenderId: "737636930756",
+  appId: "1:737636930756:web:6fc27d87a8c68cdfba2591",
+  measurementId: "G-Z6S7F6ZQ4E"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// 🔥 Form Submit
+document.getElementById("clientForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+  const documentType = document.getElementById("document").value;
+  const charges = document.getElementById("charges").value;
+
+  push(ref(db, "clients"), {
+    name,
+    phone,
+    documentType,
+    charges
+  });
+
+  alert("Saved ✅");
+  e.target.reset();
+});
+
+// 🔥 Real-time Data Show
+const table = document.getElementById("recordTable");
+
+onValue(ref(db, "clients"), (snapshot) => {
+  let output = "";
+  let total = 0;
+  let count = 0;
+
+  snapshot.forEach((child) => {
+    const data = child.val();
+    count++;
+    total += Number(data.charges);
+
+    output += `
+      <tr>
+        <td>${data.name}</td>
+        <td>${data.phone}</td>
+        <td>${data.documentType}</td>
+        <td>${data.charges}</td>
+      </tr>
+    `;
+  });
+
+  table.innerHTML = output;
+  document.getElementById("totalClients").innerText = count;
+  document.getElementById("totalIncome").innerText = total;
+});
+
+</script>
+
 </body>
 </html>

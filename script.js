@@ -1,3 +1,4 @@
+
 let totalClients = 0;
 let totalIncome = 0;
 
