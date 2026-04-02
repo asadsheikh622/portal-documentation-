@@ -1,129 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shop Management Portal</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Management Portal</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<header>
-    <h1>Shop Management Portal</h1>
-</header>
+    <header>
+        <h1>Shop Management Portal</h1>
+    </header>
 
-<section class="dashboard">
-    <div class="card">
-        <h3>Total Clients</h3>
-        <p id="totalClients">0</p>
-    </div>
-    <div class="card">
-        <h3>Total Income</h3>
-        <p id="totalIncome">0</p>
-    </div>
-</section>
+    <section class="dashboard">
+        <div class="card">
+            <h3>Total Clients</h3>
+            <p id="totalClients">0</p>
+        </div>
+        <div class="card">
+            <h3>Total Income</h3>
+            <p id="totalIncome">0</p>
+        </div>
+    </section>
 
-<section class="form-section">
-    <h2>Add Client Record</h2>
-    <form id="clientForm">
-        <input type="text" id="name" placeholder="Client Name" required>
-        <input type="text" id="phone" placeholder="Phone Number" required>
-        <select id="document">
+    <section class="form-section">
+        <h2>Add Client Record</h2>
+        <form id="clientForm">
+            <input type="text" id="name" placeholder="Client Name" required>
+            <input type="number" id="phone" placeholder="Phone Number" required>
+            <input type="text" id="document" placeholder="Services" required>
+
+            <!-- <select id="document">
             <option value="CV">CV</option>
             <option value="Affidavit">Affidavit</option>
             <option value="Sale Agreement">Sale Agreement</option>
-        </select>
-        <input type="number" id="charges" placeholder="Charges" required>
-        <button type="submit">Add Record</button>
-    </form>
-</section>
+        </select> -->
+            <input type="number" id="charges" placeholder="Charges" required>
+            <input type="number" id="advance" placeholder="Advance">
+            <input type="number" id="remaining" placeholder="Remaining">
+            <button type="submit">Add Record</button>
+        </form>
+    </section>
 
-<section class="table-section">
-    <h2>Client Records</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Document</th>
-                <th>Charges</th>
-            </tr>
-        </thead>
-        <tbody id="recordTable"></tbody>
-    </table>
-</section>
+    <section class="table-section">
+        <h2>Client Records</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Document</th>
+                    <th>Charges</th>
+                    <th>Advance Amount </th>
+                    <th>Remaining Amount</th>
+                </tr>
+            </thead>
+            <tbody id="recordTable"></tbody>
+        </table>
+    </section>
 
-<!-- 🔥 Firebase Module Script -->
-<script type="module">
+    <!-- 🔥 Firebase Module Script -->
+    <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
-// 🔥 Your Firebase Config (already correct)
-const firebaseConfig = {
-  apiKey: "AIzaSyA03P8WbsCUIQ9ivdq_vSFU6MBPzgY7wLw",
-  authDomain: "customer-portal567.firebaseapp.com",
-  databaseURL: "https://customer-portal567-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "customer-portal567",
-  storageBucket: "customer-portal567.firebasestorage.app",
-  messagingSenderId: "737636930756",
-  appId: "1:737636930756:web:6fc27d87a8c68cdfba2591",
-  measurementId: "G-Z6S7F6ZQ4E"
-};
+        // 🔥 Your Firebase Config (already correct)
+        const firebaseConfig = {
+            apiKey: "AIzaSyA03P8WbsCUIQ9ivdq_vSFU6MBPzgY7wLw",
+            authDomain: "customer-portal567.firebaseapp.com",
+            databaseURL: "https://customer-portal567-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "customer-portal567",
+            storageBucket: "customer-portal567.firebasestorage.app",
+            messagingSenderId: "737636930756",
+            appId: "1:737636930756:web:6fc27d87a8c68cdfba2591",
+            measurementId: "G-Z6S7F6ZQ4E"
+        };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-// 🔥 Form Submit
-document.getElementById("clientForm").addEventListener("submit", (e) => {
-  e.preventDefault();
+        // 🔥 Form Submit
+        document.getElementById("clientForm").addEventListener("submit", (e) => {
+            e.preventDefault();
 
-  const name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
-  const documentType = document.getElementById("document").value;
-  const charges = document.getElementById("charges").value;
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+            const documentType = document.getElementById("document").value;
+            const charges = document.getElementById("charges").value;
+            const advance = document.getElementById("advance").value;
+            const remaining = document.getElementById("remaining").value;
 
-  push(ref(db, "clients"), {
-    name,
-    phone,
-    documentType,
-    charges
-  });
+            push(ref(db, "clients"), {
+                name,
+                phone,
+                documentType,
+                charges,
+                advance,
+                remaining
+            });
 
-  alert("Saved ✅");
-  e.target.reset();
-});
+            alert("Save ho gaya ✅");
+            e.target.reset();
+        });
 
-// 🔥 Real-time Data Show
-const table = document.getElementById("recordTable");
+        // 🔥 Real-time Data Show
+        const table = document.getElementById("recordTable");
 
-onValue(ref(db, "clients"), (snapshot) => {
-  let output = "";
-  let total = 0;
-  let count = 0;
+        onValue(ref(db, "clients"), (snapshot) => {
+            let output = "";
+            let total = 0;
+            let count = 0;
 
-  snapshot.forEach((child) => {
-    const data = child.val();
-    count++;
-    total += Number(data.charges);
+            snapshot.forEach((child) => {
+                const data = child.val();
+                count++;
+                total += Number(data.charges);
 
-    output += `
+                output += `
       <tr>
         <td>${data.name}</td>
         <td>${data.phone}</td>
         <td>${data.documentType}</td>
         <td>${data.charges}</td>
+        <td>${data.advance}</td>
+        <td>${data.remaining}</td>
       </tr>
     `;
-  });
+            });
 
-  table.innerHTML = output;
-  document.getElementById("totalClients").innerText = count;
-  document.getElementById("totalIncome").innerText = total;
-});
+            table.innerHTML = output;
+            document.getElementById("totalClients").innerText = count;
+            document.getElementById("totalIncome").innerText = total;
+        });
 
-</script>
+    </script>
 
 </body>
+
 </html>
