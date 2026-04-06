@@ -70,3 +70,20 @@ table th, table td {
         align-items: center;
     }
 }
+
+
+button {
+  padding: 6px 10px;
+  margin: 2px;
+  border: none;
+  cursor: pointer;
+}
+
+button:first-child {
+  background: orange;
+}
+
+button:last-child {
+  background: red;
+  color: white;
+}

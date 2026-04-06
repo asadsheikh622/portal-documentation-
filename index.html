@@ -40,7 +40,9 @@
             <input type="number" id="charges" placeholder="Charges" required>
             <input type="number" id="advance" placeholder="Advance">
             <input type="number" id="remaining" placeholder="Remaining">
-            <button type="submit">Add Record</button>
+            <button type="submit" style="background-color: #0B3D91; padding: 10px 20px; border: none;">
+  Add Record
+</button>
         </form>
     </section>
 
@@ -55,90 +57,122 @@
                     <th>Charges</th>
                     <th>Advance Amount </th>
                     <th>Remaining Amount</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="recordTable"></tbody>
         </table>
     </section>
 
-    <!-- 🔥 Firebase Module Script -->
-    <script type="module">
+   <script type="module">
 
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
-        // 🔥 Your Firebase Config (already correct)
-        const firebaseConfig = {
-            apiKey: "AIzaSyA03P8WbsCUIQ9ivdq_vSFU6MBPzgY7wLw",
-            authDomain: "customer-portal567.firebaseapp.com",
-            databaseURL: "https://customer-portal567-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "customer-portal567",
-            storageBucket: "customer-portal567.firebasestorage.app",
-            messagingSenderId: "737636930756",
-            appId: "1:737636930756:web:6fc27d87a8c68cdfba2591",
-            measurementId: "G-Z6S7F6ZQ4E"
-        };
+// Firebase Config
+const firebaseConfig = {
+    apiKey: "AIzaSyA03P8WbsCUIQ9ivdq_vSFU6MBPzgY7wLw",
+    authDomain: "customer-portal567.firebaseapp.com",
+    databaseURL: "https://customer-portal567-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "customer-portal567",
+    storageBucket: "customer-portal567.firebasestorage.app",
+    messagingSenderId: "737636930756",
+    appId: "1:737636930756:web:6fc27d87a8c68cdfba2591",
+    measurementId: "G-Z6S7F6ZQ4E"
+};
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-        // 🔥 Form Submit
-        document.getElementById("clientForm").addEventListener("submit", (e) => {
-            e.preventDefault();
+// 🔥 FORM SUBMIT
+let editId = null;
 
-            const name = document.getElementById("name").value;
-            const phone = document.getElementById("phone").value;
-            const documentType = document.getElementById("document").value;
-            const charges = document.getElementById("charges").value;
-            const advance = document.getElementById("advance").value;
-            const remaining = document.getElementById("remaining").value;
+document.getElementById("clientForm").addEventListener("submit", (e) => {
+    e.preventDefault();
 
-            push(ref(db, "clients"), {
-                name,
-                phone,
-                documentType,
-                charges,
-                advance,
-                remaining
-            });
+    const name = document.getElementById("name").value;
+    const phone = document.getElementById("phone").value;
+    const documentType = document.getElementById("document").value;
+    const charges = document.getElementById("charges").value;
+    const advance = document.getElementById("advance").value;
+    const remaining = document.getElementById("remaining").value;
 
-            alert("Save ho gaya ✅");
-            e.target.reset();
+    if (editId === null) {
+        // ADD
+        push(ref(db, "clients"), {
+            name, phone, documentType, charges, advance, remaining
         });
-
-        // 🔥 Real-time Data Show
-        const table = document.getElementById("recordTable");
-
-        onValue(ref(db, "clients"), (snapshot) => {
-            let output = "";
-            let total = 0;
-            let count = 0;
-
-            snapshot.forEach((child) => {
-                const data = child.val();
-                count++;
-                total += Number(data.charges);
-
-                output += `
-      <tr>
-        <td>${data.name}</td>
-        <td>${data.phone}</td>
-        <td>${data.documentType}</td>
-        <td>${data.charges}</td>
-        <td>${data.advance}</td>
-        <td>${data.remaining}</td>
-      </tr>
-    `;
-            });
-
-            table.innerHTML = output;
-            document.getElementById("totalClients").innerText = count;
-            document.getElementById("totalIncome").innerText = total;
+        alert("Save ho gaya ✅");
+    } else {
+        // UPDATE
+        set(ref(db, "clients/" + editId), {
+            name, phone, documentType, charges, advance, remaining
         });
+        alert("Update ho gaya ✅");
+        editId = null;
+    }
 
-    </script>
+    e.target.reset();
+});
 
+// 🔥 REALTIME DATA SHOW
+const table = document.getElementById("recordTable");
+
+onValue(ref(db, "clients"), (snapshot) => {
+    let output = "";
+    let total = 0;
+    let count = 0;
+
+    snapshot.forEach((child) => {
+        const data = child.val();
+        const id = child.key;
+
+        count++;
+        total += Number(data.charges);
+
+        output += `
+        <tr>
+            <td>${data.name}</td>
+            <td>${data.phone}</td>
+            <td>${data.documentType}</td>
+            <td>${data.charges}</td>
+            <td>${data.advance}</td>
+            <td>${data.remaining}</td>
+            <td>
+                <button onclick="editData('${id}', '${data.name}', '${data.phone}', '${data.documentType}', '${data.charges}', '${data.advance}', '${data.remaining}')">Edit</button>
+                <button onclick="deleteData('${id}')">Delete</button>
+            </td>
+        </tr>
+        `;
+    });
+
+    table.innerHTML = output;
+    document.getElementById("totalClients").innerText = count;
+    document.getElementById("totalIncome").innerText = total;
+});
+
+// 🔥 DELETE FUNCTION
+window.deleteData = function(id) {
+    if (confirm("Delete karna hai?")) {
+        remove(ref(db, "clients/" + id));
+    }
+};
+
+// 🔥 EDIT FUNCTION
+window.editData = function(id, name, phone, documentType, charges, advance, remaining) {
+
+    document.getElementById("name").value = name;
+    document.getElementById("phone").value = phone;
+    document.getElementById("document").value = documentType;
+    document.getElementById("charges").value = charges;
+    document.getElementById("advance").value = advance;
+    document.getElementById("remaining").value = remaining;
+
+    editId = id;
+};
+
+</script>
 </body>
 
 </html>
